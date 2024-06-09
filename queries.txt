@@ -1,0 +1,18 @@
+{
+    "query1":{
+        "pre_sql":"DROP TABLE tickers;"
+        ,"sql":"CREATE TABLE IF NOT EXISTS tickers 
+        (
+        id SERIAL 
+        , ts timestamp 
+        , open    float 
+        , close   float 
+        , low     float 
+        , high    float 
+        , volume  float 
+        , ticker  text 
+        );"
+        ,"type":"dml"
+        ,"post_sql":"ALTER TABLE tickers ADD CONSTRAINT tickers_ts_ticker_key UNIQUE (ts, ticker);"
+    }
+}

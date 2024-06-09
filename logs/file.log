@@ -1,0 +1,9 @@
+2024-05-11 08:20:23,916 - data - INFO - Data object created
+2024-05-11 08:20:23,920 - data - INFO - Data object created
+2024-05-11 08:20:23,921 - data - ERROR - Error occurred in get_data: get_data() missing 1 required positional argument: 'ticker'
+2024-05-11 08:20:30,929 - data - INFO - Data object created
+2024-05-11 08:20:30,930 - data - INFO - Data object created
+2024-05-11 08:20:30,930 - data - ERROR - Error occurred in get_data: get_data() missing 1 required positional argument: 'ticker'
+2024-05-11 08:20:50,977 - data - INFO - Data object created
+2024-05-11 08:20:50,978 - data - INFO - Data object created
+2024-05-11 08:20:50,978 - data - ERROR - Error occurred in get_data: get_data() missing 1 required positional argument: 'ticker'

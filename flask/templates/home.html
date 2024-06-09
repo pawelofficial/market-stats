@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<!-- This is a comment -->
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>{{ ticker }} stats</h1>
+    <!-- links for {{ links }}-->
+    <ul>
+        {% for value in links %}
+            <li><a href="{{ value }}">{{ value }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

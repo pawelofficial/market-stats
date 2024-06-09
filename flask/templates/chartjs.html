@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Chartjs Charts</title>
+</head>
+
+<body>
+    <!-- dropdown for {{ dropdown_stats }} -->
+    <!--
+    <select id="dropdown_stats">
+        {% for value in dropdown_stats %}
+            <option value="{{ value }}">{{ value }}</option>
+        {% endfor %}
+    </select>
+    -->
+
+
+    <div style="height: 50vh; width: 50%;">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+        var labels = {{ labels | safe }};
+        var data = {{ data | safe }};
+        var chartLabel= {{ chartLabel | safe }};
+    </script>
+    <script src="{{ url_for('static', filename='js/linechart.js') }}"></script>
+</body>
+</html>
