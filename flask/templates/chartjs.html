@@ -15,7 +15,12 @@
         {% endfor %}
     </select>
     -->
+    <!--- recalculate button -->
+    <button id="recalculate">Recalculate</button>
 
+    <!-- show start_date and end_date -->
+    <input type="date" id="start_date" value="{{ start_date }}">
+    <input type="date" id="end_date" value="{{ end_date }}">
 
     <div style="height: 50vh; width: 50%;">
         <canvas id="myChart"></canvas>

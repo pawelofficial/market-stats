@@ -1,4 +1,8 @@
-2024-06-09 10:50:22,293 - db - INFO - Connecting to PostgreSQL
-2024-06-09 10:50:22,400 - db - INFO - Connected to PostgreSQL successfully
-2024-06-09 10:50:22,400 - db - INFO - Executing query: select * from AAPL limit 50 
-2024-06-09 10:50:22,482 - db - INFO - Query executed successfully, got df of shape (50, 8)
+2024-06-09 17:12:19,369 - db - INFO - Connecting to PostgreSQL
+2024-06-09 17:12:19,370 - db - INFO - Connected to PostgreSQL successfully
+2024-06-09 17:12:19,370 - db - INFO - Executing query: select * from AAPL  
+2024-06-09 17:12:19,418 - db - INFO - Query executed successfully, got df of shape (1115, 8)
+2024-06-09 17:12:19,369 - db - INFO - Connecting to PostgreSQL
+2024-06-09 17:12:19,370 - db - INFO - Connected to PostgreSQL successfully
+2024-06-09 17:12:19,370 - db - INFO - Executing query: select * from AAPL  
+2024-06-09 17:12:19,418 - db - INFO - Query executed successfully, got df of shape (1115, 8)

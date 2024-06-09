@@ -43,6 +43,7 @@ class data:
         
         start_ts=start_ts = start_ts if start_ts else datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=timedelta_days)
         end_ts=end_ts if end_ts else datetime.now().replace(hour=23, minute=59, second=59, microsecond=0)
+
         interval=interval if interval else '1m'
         
         if ticker in self.tickers_map.keys():
@@ -52,7 +53,7 @@ class data:
         self.logger.info(f'Getting data for {ticker} / {ticker_mapped} from {start_ts} to {end_ts} ({ (end_ts-start_ts).days} days )  with interval {interval}')
         # download df from yfinance 
         
-        data = yf.download(ticker_mapped, start=start_ts, end=end_ts + timedelta(days=1), interval='1m')
+        data = yf.download(ticker_mapped, start=start_ts, end=end_ts + timedelta(days=1), interval=interval)
         data.columns=[col.lower() for col in data.columns]
         data['ticker']=ticker
         data['ts']=data.index
@@ -87,7 +88,13 @@ class data:
                                  ,end_ts   = None 
                                  ,interval = None                         
                                  ):
+        # convert start_ts and end_ts to datetime from strings 
+        start_ts = pd.to_datetime(start_ts) if start_ts is not None else None
+        end_ts = pd.to_datetime(end_ts) if end_ts is not None else None
+        
+        
         df=self.get_data(ticker,start_ts,end_ts,interval)
+
         # write to tmp table
         df.columns=[col.lower() for col in df.columns]
         self.db.write_tmp_df(df,tmp_table)
@@ -119,5 +126,5 @@ if __name__=='__main__':
     
     d.db.create_or_replace_ticker_table('AAPL')
     d.db.create_or_replace_ticker_table('SPX')
-    d.download_historical_data(tgt_table='AAPL',ticker='AAPL')
-    d.download_historical_data(tgt_table='SPX',ticker='SPX')
+    d.download_historical_data(tgt_table='AAPL',ticker='AAPL',start_ts='2020-01-01',end_ts='2024-06-09',interval='1d')
+    #d.download_historical_data(tgt_table='SPX',ticker='SPX')

@@ -19,6 +19,10 @@ class calcview:
         # capitalize column names
         self.df.columns=[col.upper() for col in self.df.columns]
         
+    # aggregate to span in seconds 
+
+        
+        
     # calculates EMA ans SMA on MA_cols with ma_spans
     def calculate_mas(self,cols=None,spans=None):
         cols=cols if cols is not None else self.ma_cols
