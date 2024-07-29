@@ -1,7 +1,7 @@
 {
     "query1":{
-        "pre_sql":"DROP TABLE tickers;"
-        ,"sql":"CREATE TABLE IF NOT EXISTS tickers 
+        "pre_sql":"DROP TABLE <ticker>;"
+        ,"sql":"CREATE TABLE IF NOT EXISTS <ticker> 
         (
         id SERIAL 
         , ts timestamp 
@@ -13,6 +13,9 @@
         , ticker  text 
         );"
         ,"type":"dml"
-        ,"post_sql":"ALTER TABLE tickers ADD CONSTRAINT tickers_ts_ticker_key UNIQUE (ts, ticker);"
+        ,"post_sql":[
+            "ALTER TABLE <ticker> ADD CONSTRAINT <uk_constraint> UNIQUE (ts, ticker);"
+            ,"ALTER TABLE <ticker> ADD CONSTRAINT <pk_constraint> PRIMARY KEY (ID);"
+            ]
     }
 }

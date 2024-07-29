@@ -1,7 +1,7 @@
 import logging
 import os 
 import functools
-def setup_logger(name,fp='./',mode='w'):
+def setup_logger(name,fp='./logs/',mode='w'):
     # Create a custom logger
     logger = logging.getLogger(name)
 
@@ -44,7 +44,9 @@ def exception_logger(cls):
                         return attr(*args, **kwargs)
                     except Exception as e:
                         self.logger.error(f"Exception occurred in {name}: {e}")
+                        print(f'there was an error {e}')
                         raise
+                        return None 
                 return wrapper
             else:
                 return attr

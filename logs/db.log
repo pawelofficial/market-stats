@@ -1,8 +1,4 @@
-2024-06-09 17:12:19,369 - db - INFO - Connecting to PostgreSQL
-2024-06-09 17:12:19,370 - db - INFO - Connected to PostgreSQL successfully
-2024-06-09 17:12:19,370 - db - INFO - Executing query: select * from AAPL  
-2024-06-09 17:12:19,418 - db - INFO - Query executed successfully, got df of shape (1115, 8)
-2024-06-09 17:12:19,369 - db - INFO - Connecting to PostgreSQL
-2024-06-09 17:12:19,370 - db - INFO - Connected to PostgreSQL successfully
-2024-06-09 17:12:19,370 - db - INFO - Executing query: select * from AAPL  
-2024-06-09 17:12:19,418 - db - INFO - Query executed successfully, got df of shape (1115, 8)
+2024-07-29 09:00:26,060 - db - INFO - Connecting to PostgreSQL
+2024-07-29 09:00:26,105 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 09:00:26,105 - db - INFO - Executing query: select "CLOSE" from "dev"."islands"
+2024-07-29 09:00:26,163 - db - INFO - Query executed successfully, got df of shape (66, 1)

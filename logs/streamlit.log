@@ -1,0 +1,299 @@
+2024-07-29 08:34:02,948 - streamlit - INFO - initializing db
+2024-07-29 08:34:02,949 - streamlit - INFO - initializing db
+2024-07-29 08:34:02,949 - streamlit - INFO - initializing db
+2024-07-29 08:34:02,950 - streamlit - INFO - initializing db
+2024-07-29 08:34:02,957 - streamlit - INFO - initializing db_con_time
+2024-07-29 08:34:02,970 - streamlit - INFO - initializing db_con_time
+2024-07-29 08:34:02,971 - streamlit - INFO - initializing db_con_time
+2024-07-29 08:34:02,971 - streamlit - INFO - initializing db_con_time
+2024-07-29 08:34:02,974 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,985 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,987 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,988 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,997 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:02,998 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,000 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+lizing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db
+970 - streamlit - INFO - initializing db_con_time
+2024-07-29 08:34:02,971 - streamlit - INFO - initializing db_con_time
+2024-07-29 08:34:02,971 - streamlit - INFO - initializing db_con_time
+2024-07-29 08:34:02,974 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,985 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,987 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,988 - streamlit - INFO - initializing nasdaq_symbols
+2024-07-29 08:34:02,997 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:02,998 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,000 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,001 - streamlit - INFO - initializing first_run
+2024-07-29 08:34:03,133 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,139 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,173 - streamlit - INFO - connecting to db
+2024-07-29 08:34:03,199 - streamlit - INFO - connecting to db

@@ -1,0 +1,191 @@
+CREATE SCHEMA market_stats_raw;
+
+-- Step 2: Copy tables and their data
+DO $$ 
+DECLARE
+    table_rec RECORD;
+BEGIN
+    FOR table_rec IN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'market_stats'
+		and tablename not like 'CV%'
+        LOOP
+        EXECUTE 'CREATE TABLE market_stats_raw.' || table_rec.tablename || ' (LIKE market_stats.' || table_rec.tablename || ' INCLUDING ALL)';
+        EXECUTE 'INSERT INTO market_stats_raw.' || table_rec.tablename || ' SELECT * FROM market_stats.' || table_rec.tablename;
+    END LOOP;2END $$;
+
+
+
+-- pg locks 
+ SELECT 
+    pg_stat_activity.pid,
+    pg_class.relname,
+    pg_locks.transactionid,
+    pg_locks.granted,
+    pg_stat_activity.query as current_query,
+    age(now(), pg_stat_activity.query_start) as age
+FROM 
+    pg_stat_activity, 
+    pg_locks 
+LEFT OUTER JOIN 
+    pg_class 
+ON 
+    (pg_locks.relation = pg_class.oid)
+WHERE 
+    pg_stat_activity.pid = pg_locks.pid
+    AND pg_locks.mode = 'ExclusiveLock'
+ORDER BY 
+    age DESC;
+      
+
+-- 100$ performance 
+
+ WITH price_changes AS (
+    SELECT 
+        "TS" as TS, 
+        "CLOSE" as close ,
+        "TICKER" as TICKER,
+        LAG("CLOSE") OVER (PARTITION BY "TICKER" ORDER BY "TS") AS prev_close
+    FROM 
+        "dev"."CV_ALL"
+),
+investment_growth AS (
+    SELECT 
+         ts,
+         close,
+         TICKER,
+        100 * (close / prev_close) AS investment_value
+    FROM 
+        price_changes
+    WHERE 
+        prev_close IS NOT NULL
+)
+SELECT 
+    TICKER,
+    TS,
+    investment_value
+FROM 
+    investment_growth;
+
+
+
+-- raw tables that i have 
+        SELECT table_name, "symbol",s.n_live_tup AS row_count
+        FROM "dev"."nasdaq"  
+        left join information_schema.tables t  
+            on table_name = "symbol"
+            and  table_schema = 'market_stats_raw'
+        LEFT JOIN  pg_stat_user_tables s 
+    		ON t.table_name = s.relname
+    		and t.table_schema=s.schemaname
+          AND table_type = 'BASE TABLE'
+          and table_name !='tmp'
+          order by "row_count"
+          ;
+
+
+
+
+create table nasdaq(symbol text);
+INSERT INTO nasdaq (symbol) VALUES ('AAPL');
+INSERT INTO nasdaq (symbol) VALUES ('MSFT');
+INSERT INTO nasdaq (symbol) VALUES ('NVDA');
+INSERT INTO nasdaq (symbol) VALUES ('GOOGL');
+INSERT INTO nasdaq (symbol) VALUES ('GOOG');
+INSERT INTO nasdaq (symbol) VALUES ('AMZN');
+INSERT INTO nasdaq (symbol) VALUES ('META');
+INSERT INTO nasdaq (symbol) VALUES ('AVGO');
+INSERT INTO nasdaq (symbol) VALUES ('TSLA');
+INSERT INTO nasdaq (symbol) VALUES ('COST');
+INSERT INTO nasdaq (symbol) VALUES ('ASML');
+INSERT INTO nasdaq (symbol) VALUES ('NFLX');
+INSERT INTO nasdaq (symbol) VALUES ('AZN');
+INSERT INTO nasdaq (symbol) VALUES ('ADE');
+INSERT INTO nasdaq (symbol) VALUES ('PEP');
+INSERT INTO nasdaq (symbol) VALUES ('AMD');
+INSERT INTO nasdaq (symbol) VALUES ('LIN');
+INSERT INTO nasdaq (symbol) VALUES ('TMUS');
+INSERT INTO nasdaq (symbol) VALUES ('QCOM');
+INSERT INTO nasdaq (symbol) VALUES ('CSCO');
+INSERT INTO nasdaq (symbol) VALUES ('TXN');
+INSERT INTO nasdaq (symbol) VALUES ('AMGN');
+INSERT INTO nasdaq (symbol) VALUES ('INTU');
+INSERT INTO nasdaq (symbol) VALUES ('PDD');
+INSERT INTO nasdaq (symbol) VALUES ('AMAT');
+INSERT INTO nasdaq (symbol) VALUES ('ISRG');
+INSERT INTO nasdaq (symbol) VALUES ('ARM');
+INSERT INTO nasdaq (symbol) VALUES ('CMCSA');
+INSERT INTO nasdaq (symbol) VALUES ('INTC');
+INSERT INTO nasdaq (symbol) VALUES ('HON');
+INSERT INTO nasdaq (symbol) VALUES ('VRTX');
+INSERT INTO nasdaq (symbol) VALUES ('KNG');
+INSERT INTO nasdaq (symbol) VALUES ('MU');
+INSERT INTO nasdaq (symbol) VALUES ('LRCX');
+INSERT INTO nasdaq (symbol) VALUES ('REGN');
+INSERT INTO nasdaq (symbol) VALUES ('ADI');
+INSERT INTO nasdaq (symbol) VALUES ('KLAC');
+INSERT INTO nasdaq (symbol) VALUES ('PANW');
+INSERT INTO nasdaq (symbol) VALUES ('ADP');
+INSERT INTO nasdaq (symbol) VALUES ('GILD');
+INSERT INTO nasdaq (symbol) VALUES ('AN');
+INSERT INTO nasdaq (symbol) VALUES ('MDLZ');
+INSERT INTO nasdaq (symbol) VALUES ('SUX');
+INSERT INTO nasdaq (symbol) VALUES ('MELI');
+INSERT INTO nasdaq (symbol) VALUES ('SNPS');
+INSERT INTO nasdaq (symbol) VALUES ('CTAS');
+INSERT INTO nasdaq (symbol) VALUES ('CDNS');
+INSERT INTO nasdaq (symbol) VALUES ('MAR');
+INSERT INTO nasdaq (symbol) VALUES ('CSX');
+INSERT INTO nasdaq (symbol) VALUES ('ORLY');
+INSERT INTO nasdaq (symbol) VALUES ('NXPI');
+INSERT INTO nasdaq (symbol) VALUES ('CRWD');
+INSERT INTO nasdaq (symbol) VALUES ('PYPL');
+INSERT INTO nasdaq (symbol) VALUES ('WDAY');
+INSERT INTO nasdaq (symbol) VALUES ('ROP');
+INSERT INTO nasdaq (symbol) VALUES ('MRVL');
+INSERT INTO nasdaq (symbol) VALUES ('CEG');
+INSERT INTO nasdaq (symbol) VALUES ('MNST');
+INSERT INTO nasdaq (symbol) VALUES ('CHTR');
+INSERT INTO nasdaq (symbol) VALUES ('PCAR');
+INSERT INTO nasdaq (symbol) VALUES ('ADSK');
+INSERT INTO nasdaq (symbol) VALUES ('AEP');
+INSERT INTO nasdaq (symbol) VALUES ('CPRT');
+INSERT INTO nasdaq (symbol) VALUES ('ROST');
+INSERT INTO nasdaq (symbol) VALUES ('MRNA');
+INSERT INTO nasdaq (symbol) VALUES ('MCHP');
+INSERT INTO nasdaq (symbol) VALUES ('TEAM');
+INSERT INTO nasdaq (symbol) VALUES ('KDP');
+INSERT INTO nasdaq (symbol) VALUES ('PAYX');
+INSERT INTO nasdaq (symbol) VALUES ('TTD');
+INSERT INTO nasdaq (symbol) VALUES ('ODFL');
+INSERT INTO nasdaq (symbol) VALUES ('FTNT');
+INSERT INTO nasdaq (symbol) VALUES ('DASH');
+INSERT INTO nasdaq (symbol) VALUES ('KHC');
+INSERT INTO nasdaq (symbol) VALUES ('FAST');
+INSERT INTO nasdaq (symbol) VALUES ('VRSK');
+INSERT INTO nasdaq (symbol) VALUES ('DDOG');
+INSERT INTO nasdaq (symbol) VALUES ('IDXX');
+INSERT INTO nasdaq (symbol) VALUES ('EA');
+INSERT INTO nasdaq (symbol) VALUES ('KR');
+INSERT INTO nasdaq (symbol) VALUES ('CTSH');
+INSERT INTO nasdaq (symbol) VALUES ('EXC');
+INSERT INTO nasdaq (symbol) VALUES ('GEHC');
+INSERT INTO nasdaq (symbol) VALUES ('FANG');
+INSERT INTO nasdaq (symbol) VALUES ('CCEP');
+INSERT INTO nasdaq (symbol) VALUES ('CSGP');
+INSERT INTO nasdaq (symbol) VALUES ('XEL');
+INSERT INTO nasdaq (symbol) VALUES ('CDW');
+INSERT INTO nasdaq (symbol) VALUES ('II');
+INSERT INTO nasdaq (symbol) VALUES ('LULU');
+INSERT INTO nasdaq (symbol) VALUES ('ON');
+INSERT INTO nasdaq (symbol) VALUES ('GFS');
+INSERT INTO nasdaq (symbol) VALUES ('ZS');
+INSERT INTO nasdaq (symbol) VALUES ('ANSS');
+INSERT INTO nasdaq (symbol) VALUES ('TTWO');
+INSERT INTO nasdaq (symbol) VALUES ('DXCM');
+INSERT INTO nasdaq (symbol) VALUES ('DLTR');
+INSERT INTO nasdaq (symbol) VALUES ('WD');
+INSERT INTO nasdaq (symbol) VALUES ('ILMN');
+INSERT INTO nasdaq (symbol) VALUES ('MD');
+INSERT INTO nasdaq (symbol) VALUES ('WA');

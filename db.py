@@ -6,15 +6,15 @@ import pandas as pd
 import json 
 from sqlalchemy import create_engine, MetaData
 import os 
-
-
+from utils import exception_logger
+@exception_logger
 class Database:
     def __init__(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         logs_dir = os.path.join(current_dir, 'logs')
         self.host = '127.0.0.1'
         self.database = 'dev'
-        self.schema='market_stats'
+        self.schema='dev'
         self.user = 'postgres'
         self.password = 'admin'
         # THIS FILE PATH 
@@ -38,6 +38,7 @@ class Database:
             self.logger.info("Connected to PostgreSQL successfully")
         except Exception as error:
             self.logger.error(f"Error while connecting to PostgreSQL {error}")
+    
 
     def execute_select(self, query,nfetch = None ):
         query=text(query)
@@ -55,7 +56,7 @@ class Database:
         self.logger.info(f"Query executed successfully, got df of shape {result.shape}")
         return result
 
-    def execute_dml(self, query):
+    def execute_dml(self, query,msg=''):
         query=text(query)
         self.logger.info(f"Executing query: {query}")
         if not self.engine:
@@ -66,17 +67,21 @@ class Database:
             self.session.commit()
             self.logger.info("Query executed successfully")
         except Exception as error:
-            self.logger.error(f"Error while executing query {error}")
+            self.logger.error(f"Error while executing query {error} {msg}")
             self.connect()
 
 
     # writes df to a tmp table 
-    def write_tmp_df(self, df, table_name='tmp_table'):
+    def write_tmp_df(self, df, table_name='tmp',drop=True):
+        if drop:
+            self.execute_dml(f'drop table "{table_name}" CASCADE')
+            
         if not self.engine:
             self.logger.error("You must connect to the database first")
             return None
         try:
             df.to_sql(table_name, self.engine, if_exists='replace', index=False)
+
             self.logger.info(f"DataFrame written to {table_name} successfully.")
         except Exception as error:
             self.logger.error(f"Error while writing to PostgreSQL {error}")
@@ -92,10 +97,20 @@ class Database:
     def create_or_replace_ticker_table(self,ticker):
         dic=self.read_queries()['query1']
         
-        for k,v in dic.items():
-            if 'sql' in k:
-                v=v.replace('tickers',ticker)
+        for k,v in dic.items(): # for query in queries 
+            if 'pre_sql'==k:    # adjust and execute pre sql 
+                v=v.replace('<ticker>',f'"{ticker.upper()}"' )
                 self.execute_dml(v)
+            
+            if 'sql' == k:      # adjust and execute sql 
+                v=v.replace('<ticker>',f'"{ticker.upper()}"' )
+                self.execute_dml(v)
+            elif 'post_sql'==k: # adjust and execute post_sql 
+                for vv in v:
+                    vv=vv.replace('<ticker>',f'"{ticker.upper()}"' )
+                    vv=vv.replace('<uk_constraint>',f'"{ticker.upper()}_UK"' )
+                    vv=vv.replace('<pk_constraint>',f'"{ticker.upper()}_PK"' )
+                    self.execute_dml(vv)
     
     
     def execure_queries(self,dic):    
@@ -116,7 +131,13 @@ class Database:
 if __name__=='__main__':
     db=Database()
     db.connect()
+    db.execute_dml('drop schema market_stats cascade')
+    db.execute_dml('create schema market_stats')
     d=db.create_or_replace_ticker_table('SPX')
+    d=db.create_or_replace_ticker_table('AAPL')
+    
+    
+    d.download_historical_data(tgt_table='AAPL',ticker='AAPL',start_ts='2024-01-01',end_ts='today',interval='1d')
     exit(1)
     
     #x=db.execute_select('select current_schema();')
