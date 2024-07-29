@@ -1,4 +1,3429 @@
-2024-07-29 09:00:26,060 - db - INFO - Connecting to PostgreSQL
-2024-07-29 09:00:26,105 - db - INFO - Connected to PostgreSQL successfully
-2024-07-29 09:00:26,105 - db - INFO - Executing query: select "CLOSE" from "dev"."islands"
-2024-07-29 09:00:26,163 - db - INFO - Query executed successfully, got df of shape (66, 1)
+2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+      WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+ITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                     2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                  2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                  2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                     2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                     2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                              2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                              2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               2024-07-29 19:10:04,208 - db - INFO - Connecting to PostgreSQL
+2024-07-29 19:10:04,212 - db - INFO - Connected to PostgreSQL successfully
+2024-07-29 19:10:04,216 - db - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-07-29 19:10:04,270 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,274 - db - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("RSI") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "RSI" > 20 AND (PrevClose <= 20 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+entifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "RSI" > 20
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "RSI","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-07-29 19:10:04,290 - db - INFO - Query executed successfully
+2024-07-29 19:10:04,292 - db - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)
+SE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        
+2024-07-29 19:10:04,309 - db - INFO - Query executed successfully, got df of shape (1119, 6)

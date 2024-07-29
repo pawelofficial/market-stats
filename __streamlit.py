@@ -131,6 +131,22 @@ def make_histogram_plot(metric,ticker):
         st.image(fp)
     
 
+def make_gains_plot(ticker,metric,cutoff):
+    with st.spinner('Making gains plot...'):
+        df=StatsView().gains_query(ticker,metric,cutoff)
+        fig,ax=plt.subplots(1,1)
+        # for each value of GID2 plot df with different color 
+        n=0
+        for gid in df['GID2'].unique():
+            df_=df[df['GID2']==gid]
+            ax.plot(df_['GID'],df_['CLOSE_NORM'],'-')
+            n+=1
+        #ax.plot(df['GID'],df['CLOSE_NORM'],'-')
+        
+        st.write(f"for ticker {ticker} with cutoff value of {metric} = {cutoff} following {n} gain curves were observed")
+        st.pyplot(fig)
+        
+        
 init_session_state()
 connect_to_db()
 make_sidebar()
@@ -200,7 +216,8 @@ plot_histogram=st.sidebar.selectbox('Histogram - last value of', ['RSI', 'MACD'
 
 
 #if st.session_state['first_run']:
-st.session_state['first_run']=False
-make_plot(plot_ticker,plot_indicator,plot_metric)
-make_histogram_plot(plot_histogram,plot_ticker)
+#st.session_state['first_run']=False
+#make_plot(plot_ticker,plot_indicator,plot_metric)
+#make_histogram_plot(plot_histogram,plot_ticker)
+make_gains_plot("AAPL", 'RSI',20)
     

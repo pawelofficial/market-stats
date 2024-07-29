@@ -90,18 +90,93 @@ class StatsView(Database):
         
         return percentile,last_value,l
         
+    def gains_query(self,ticker,metric,cutoff):
+        # drop gaisn view if exists
+        self.execute_dml(f'drop view if exists "GAINS_VIEW";')
+        
+        query = f"""
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("{metric}") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_{ticker}" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "{metric}" > {cutoff} AND (PrevClose <= {cutoff} OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "{metric}" > {cutoff}
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "{metric}","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        """
+        self.execute_dml(query)
+
+        
+        query=f"""
+            WITH CTE AS (
+           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW") 
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+        """
+        df=self.execute_select(query)
+        
+        return df
+
+        
         
 
 if __name__=='__main__':
     s= StatsView()
-    
+    df=s.gains_query('CLOSE',cutoff=150)
+    exit(1)
     #s.make_cv_all()
 
-    df=s.execute_select('select "CLOSE" from "dev"."islands"')['CLOSE'].tolist()
+    df=s.execute_select('select "GID","CLOSE","ID" from "dev"."CALC_VIEW_AAPL_GROUPED"')
     # plot data on regular line chart 
     import matplotlib.pyplot as plt
-    plt.plot(df)
+    # plot with 2 subplots 
+    fig,ax=plt.subplots(2,1)
+    ax[0].plot(df['GID'],df['CLOSE'],'.')
+    ax[1].plot(df['ID'],df['CLOSE'],'.')
+    
+
     plt.show()
+    
 
     ##df['RANK_PERC_RSI']=df['RSI'].rank(pct=True)
 #
