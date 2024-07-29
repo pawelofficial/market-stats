@@ -17,4 +17,5 @@ TO DO:
 
 
 gains curves v1 
-![image](https://github.com/user-attachments/assets/2055fb98-0001-40f1-935a-2082d9135ad6)
+![image](https://github.com/user-attachments/assets/86988c1e-2733-485f-8e8f-b246b458bca4)
+
