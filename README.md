@@ -6,6 +6,8 @@ Currently:
 
 TO DO:
     - performance chart / gains vurves ( in progress ) 
+        - to do: signum average gains curve 
+        - to do: signum average gains curve integral for few points in time ( 3,5,15,30,45,60,90)
     - backtesting 
     - wrap downloads in airflow jobs 
     
