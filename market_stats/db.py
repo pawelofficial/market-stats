@@ -1,4 +1,4 @@
-from utils import setup_logger
+from .utils import setup_logger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
@@ -6,7 +6,7 @@ import pandas as pd
 import json 
 from sqlalchemy import create_engine, MetaData
 import os 
-from utils import exception_logger
+from .utils import exception_logger
 @exception_logger
 class Database:
     def __init__(self):
@@ -23,6 +23,7 @@ class Database:
         self.engine = None
         self.session = None
         self.is_connected = False
+        self.connect() # connect by default
 
     def connect(self):
         self.logger.info("Connecting to PostgreSQL")

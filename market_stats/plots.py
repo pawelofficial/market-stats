@@ -10,8 +10,8 @@ import matplotlib.patches as mpatches
 
 import numpy as np 
 
-from calcview import * 
-from utils import setup_logger
+from .calcview import * 
+from .utils import setup_logger
 
 
 # setup logging
@@ -76,38 +76,34 @@ def make_my_plot(
     for no,ind in enumerate(indicators):
         indicators_plot = mpf.make_addplot(df[ind], panel=2, color=colors[no], secondary_y=False,ylabel=ind)
         sma_plots.append(indicators_plot)
-    # Step 7: Use mplfinance.plot to create and display the candlestick plot with subplots
-    #mpf.plot(df, type='candle', volume=True, style='yahoo', addplot=[sma_plot, indicators_plot])
 
-    # Step 7: Use mplfinance.plot to create and display the candlestick plot with subplots
     fig,axes=mpf.plot(df, type='candle', volume=True, style='yahoo', addplot=sma_plots, figscale=1.2, title=f'{ticker} Stock Price with indicatorss',returnfig=True)
-
-
-    # Add legends manually
-    # Create custom legend handles
-
-        
     indicators_patch = mpatches.Patch(color='red', label=indicators)
-
     # Add legend to the main plot (axes[0])
     axes[0].legend(handles=ema_patches, loc='lower left')
-
-# Add legend to the indicators plot (axes[2])
-#axes[2].legend(handles=[indicators_patch])
-    # savefig 
     plt.savefig(f'./plots/{plotname}.png')
-
     return fig,axes
 
+    # this plot plots a price action and colors when indicator is above / below a value 
+def make_my_plot_indicator( 
+    ticker = 'AAPL'
+    ,plotname = None 
+    ,datefrom = '2020-01-01' 
+    ,indicator='RSI'
+    ,indicator_cutoff=0
+    ): 
+    pass
 
-def make_my_histogram(data,value,percentile,metric,bins=100,N=3):
+
+
+def make_my_histogram(ticker,data,value,percentile,metric,bins=100,N=3):
     
     # plots histogram with shown value 
     fig,ax=plt.subplots()
     ax.hist(data, bins=bins, edgecolor='black')
     ax.set_xlabel('Value')
     ax.set_ylabel('Frequency')
-    ax.set_title(f'Histogram of {metric} = {np.round(value,4)}')
+    ax.set_title(f'Histogram of {metric} = {np.round(value,4)} for {ticker}')
     ax.axvline(value, color='red', linestyle='dashed', linewidth=1)
     loc=(ax.get_ylim()[0] + ax.get_ylim()[1]) / 2
     ax.text(np.round(value,N), loc, f'{np.round(percentile,N)}th percentile', 
@@ -117,4 +113,4 @@ def make_my_histogram(data,value,percentile,metric,bins=100,N=3):
     return f'./plots/histogram.png'
 
 if __name__=='__main__':
-    make_my_plot()
+    make_gains_plot()

@@ -1,10 +1,12 @@
-from db import Database
+from .db import Database
 import numpy as np 
+from .utils import setup_logger
 
 class StatsView(Database):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.connect()
+        self.logger=setup_logger('statsview')
         # Additional initialization for statsview
         
         
@@ -42,6 +44,7 @@ class StatsView(Database):
     def stats_query_1(self,metric="RSI",top_n=10,lowest=True
                       ,drop_cols=['ID','dr','dr_ts']
                       ):
+        top_n_filter=f'where dr<={top_n}' if top_n else ''
  
         # query getting stats
         query=f"""
@@ -57,7 +60,7 @@ class StatsView(Database):
                 )
             SELECT *
             FROM cte 
-            WHERE dr <={top_n}
+            {top_n_filter}
             --AND "RSI"!=0.0
             ORDER BY "{metric}";
         """
@@ -75,14 +78,30 @@ class StatsView(Database):
             sorted_data = sorted(data)
             percentile = np.searchsorted(sorted_data, value, side='right') / len(sorted_data) * 100
             return percentile
+        
+        
+        ticker_filter = f"""where "TICKER"='{ticker}'""" if ticker != 'All' else 'where 1=1 '
+
         query=f"""
-        select "{metric}" as metric from "dev"."CV_ALL"
+        select "{metric}" as metric from "dev"."CV_ALL" {ticker_filter}
         """
+        
+        
         l=self.execute_select(query)['metric'].tolist()
         # query for taking last value for specific ticker 
-        query=f"""
-        select "{metric}" as metric, "RANK_PERC_{metric}" as percentile_metric from "CV_ALL" where "TICKER"='{ticker}' and "TS"=(select max("TS") from "CV_ALL" where "TICKER"='{ticker}')
-        """
+        if value == 'last': # take last value if last was provided 
+            query=f"""
+            select "{metric}" as metric, "RANK_PERC_{metric}" as percentile_metric from "CV_ALL" {ticker_filter} and "TS"=(select max("TS") from "CV_ALL" {ticker_filter} )
+            """
+        else:             # use filtering if value was provided
+            query=f"""
+            select "{metric}" as metric, "RANK_PERC_{metric}" as percentile_metric 
+                from "CV_ALL" 
+                    {ticker_filter} 
+                    and "{metric}" > {value}*0.98 and "{metric}" < {value}*1.02 limit 1
+            """
+        
+        
         df=self.execute_select(query)
 
         last_value=df.iloc[0]['metric']
@@ -92,6 +111,7 @@ class StatsView(Database):
         
     def gains_query(self,ticker,metric,cutoff):
         # drop gaisn view if exists
+        self.logger.info(f'dropping gains view')
         self.execute_dml(f'drop view if exists "GAINS_VIEW";')
         
         query = f"""
@@ -145,13 +165,24 @@ class StatsView(Database):
             ;
         """
         self.execute_dml(query)
-
+        self.logger.info(f'created gains view {query} ')
         
         query=f"""
             WITH CTE AS (
-           SELECT "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
-           FROM "dev"."GAINS_VIEW") 
-        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE;
+           SELECT "{metric}", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
         """
         df=self.execute_select(query)
         

@@ -25,7 +25,7 @@ if do_one:
 
 
 # 2 build calc views on data 
-do_two=True
+do_two=False
 if do_two:
     d=data()
     

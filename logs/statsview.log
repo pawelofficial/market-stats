@@ -1,0 +1,3111 @@
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+2024-08-24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+24 07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+07:21:50,171 - statsview - INFO - dropping gains view
+2024-08-24 07:21:50,173 - statsview - INFO - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+O - Executing query: drop view if exists "GAINS_VIEW";
+2024-08-24 07:21:50,250 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,252 - statsview - INFO - Executing query: 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+        
+2024-08-24 07:21:50,275 - statsview - INFO - Query executed successfully
+2024-08-24 07:21:50,277 - statsview - INFO - created gains view 
+        CREATE VIEW "dev"."GAINS_VIEW" AS  
+        WITH GroupedData AS (
+            SELECT 
+                *,
+                LAG("CUMDIST_EMA_100") OVER (ORDER BY "TS") AS PrevClose
+            FROM 
+                "dev"."CALC_VIEW_AAPL" cva 
+        ),
+        GroupIdentifiers AS (
+            SELECT 
+                *,
+                CASE 
+                    WHEN "CUMDIST_EMA_100" > -2.5 AND (PrevClose <= -2.5 OR PrevClose IS NULL) THEN 1 
+                    ELSE 0 
+                END AS ChangeFlag
+            FROM 
+                GroupedData
+        ),
+        GroupSum AS (
+            SELECT 
+                *,
+                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+            FROM 
+                GroupIdentifiers
+        ),
+        FilteredData AS (
+            SELECT 
+                *
+            FROM 
+                GroupSum
+            WHERE
+                "CUMDIST_EMA_100" > -2.5
+        ),
+        IndexedData AS (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+            FROM 
+                FilteredData
+        )
+        SELECT 
+            RowIndex AS "GID",  "GID2",
+           "CUMDIST_EMA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)
+MA_100","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+        FROM 
+            IndexedData
+        ORDER BY 
+            "TS"
+            ;
+         
+2024-08-24 07:21:50,279 - statsview - INFO - Executing query: 
+            WITH CTE AS (
+           SELECT "CUMDIST_EMA_100", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           FROM "dev"."GAINS_VIEW"
+           --where "GID"<100
+        ) ,q AS (
+        SELECT *, "CLOSE"/"FV" AS "CLOSE_NORM" FROM CTE)
+       ,Q2 AS ( 
+        SELECT * 
+        , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
+        FROM Q 
+        )
+        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+	FROM Q2         
+       ORDER BY "GID2","GID"  
+        
+2024-08-24 07:21:50,322 - statsview - INFO - Query executed successfully, got df of shape (908, 10)

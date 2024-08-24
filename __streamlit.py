@@ -1,10 +1,10 @@
 import streamlit as st 
-from db import * 
-from plots import * 
-from calcview import *
-from statsview import *
-from get_data import *
-from utils import setup_logger,exception_logger
+from market_stats.db import * 
+from market_stats.plots import * 
+from market_stats.calcview import *
+from market_stats.statsview import *
+from market_stats.get_data import *
+from market_stats.utils import setup_logger,exception_logger
 import time 
 import matplotlib.pyplot as plt
 
@@ -219,5 +219,5 @@ plot_histogram=st.sidebar.selectbox('Histogram - last value of', ['RSI', 'MACD'
 #st.session_state['first_run']=False
 #make_plot(plot_ticker,plot_indicator,plot_metric)
 #make_histogram_plot(plot_histogram,plot_ticker)
-make_gains_plot("AAPL", 'RSI',20)
+#make_gains_plot("AAPL", 'RSI',20)
     

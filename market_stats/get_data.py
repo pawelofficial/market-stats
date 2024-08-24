@@ -2,10 +2,10 @@
 import pandas as pd 
 from datetime import datetime,timedelta
 import yfinance as yf
-from utils import setup_logger,exception_logger
+from .utils import setup_logger,exception_logger
 import functools
 import logging 
-from db import Database
+from .db import Database
 import re 
 from  pytickersymbols import PyTickerSymbols
 # set up log 
@@ -137,11 +137,18 @@ class data:
                                  ,df = None
                                  ,start_ts = None 
                                  ,end_ts   = None 
-                                 ,interval = None                         
+                                 ,interval = None       
+                                 ,schema='market_stats_raw'                  
                                  ):
 
 
         # if latest - get latest entry from pg 
+        if schema is not None:
+            schema=f'"{schema}".'
+        else:
+            schema=''
+        tgt_table=f'"{tgt_table}"'
+            
         if start_ts=='latest':
             start_ts=self.db.execute_select(f'select max(ts) ts from {ticker} ')
             if start_ts is not None:
@@ -174,14 +181,16 @@ class data:
         df.columns=[col.lower() for col in df.columns]
         self.db.write_tmp_df(df,tmp_table)
         
+        
         # merge tmp_table with ticker table on pk 
         query = f"""
-            INSERT INTO "{tgt_table}" ({', '.join([f'"{col}"' for col in df.columns])})
+            INSERT INTO {schema}{tgt_table } ({', '.join([f'"{col}"' for col in df.columns])})
             SELECT {', '.join([f'src."{col}"' for col in df.columns])} FROM {tmp_table} as src
             ON CONFLICT ({', '.join(pk)})
             DO UPDATE SET
             {', '.join([f'"{col}" = EXCLUDED."{col}"' for col in df.columns])}
         """
+        self.logger.info(f"query: {query}")
         self.db.execute_dml(query)
         self.logger.info(f'Historical data for {tgt_table} downloaded and merged with existing data')
               

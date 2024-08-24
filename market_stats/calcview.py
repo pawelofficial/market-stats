@@ -1,5 +1,5 @@
-from db import *
-from utils import setup_logger,exception_logger
+from .db import *
+from .utils import setup_logger,exception_logger
 
 class calcview:
     def __init__(self, ticker):
@@ -14,7 +14,16 @@ class calcview:
         self.base_df = None # base df without aggregation or any emas 
         self.agg_lvl = None # aggregation level 
         self.ma_cols=['OPEN','HIGH','LOW','CLOSE']
+        self.indicator_columns=['RSI','MACD']
         self.ma_spans=[5,10,20,50,100,200]
+        
+    def get_base_columns(self):
+        base_cols=['ID','TS','OPEN','HIGH','LOW','CLOSE','VOLUME','TICKER']
+        query="SELECT column_name FROM information_schema.columns WHERE table_name = 'CV_ALL'"
+        cols=self.db.execute_select(query)['column_name'].tolist()
+        metric_cols=[c for c in cols if c not in base_cols]
+        return base_cols,metric_cols
+        
         
     def get_data(self,ticker = None ,limit = None ):
         if self.db.is_connected==False:
@@ -118,9 +127,9 @@ class calcview:
         spans=spans if spans is not None else self.ma_spans
         for c in cols:
             for s in spans:        
-                self.df[f'CUMDIST_EMA_{s}']=self.df[f'EMA_DIST_{s}'].rolling(window=window).sum()        
+                self.df[f'CUMDIST_EMA_{s}']=self.df[f'EMA_DIST_{s}'].rolling(window=s).sum()        
                 # count for negative positive percentage
-                self.df[f'CUMSIGN_EMA_{s}']=self.df[f'EMA_DIST_{s}'].apply(lambda x: -1 if x<0 else 1).rolling(window=window).mean()
+                self.df[f'CUMSIGN_EMA_{s}']=self.df[f'EMA_DIST_{s}'].apply(lambda x: -1 if x<0 else 1).rolling(window=s).mean()
 
         
     # calculates RSI 
@@ -143,6 +152,7 @@ class calcview:
     def calculate_percentile_rank(self,indicator_columns=['RSI','MACD']
                                   ,ema_columns=['EMA_DIST','CUMDIST_EMA','DIF_EMA_CLOSE']
                                   ):
+        indicator_columns=indicator_columns or self.indicator_columns
         for col in indicator_columns:
             self.df[f'RANK_PERC_{col}']=self.df[col].rank(pct=True)
             #self.df[f'RANK_PERC_{col}'] = self.df[col].apply(lambda x: self.df[col].rank(pct=True)[self.df[col] == x].values[0])
