@@ -169,7 +169,7 @@ class StatsView(Database):
         
         query=f"""
             WITH CTE AS (
-           SELECT "{metric}", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           SELECT "{metric}","TS", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
            FROM "dev"."GAINS_VIEW"
            --where "GID"<100
         ) ,q AS (

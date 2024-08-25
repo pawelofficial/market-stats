@@ -7,6 +7,7 @@ from market_stats.get_data import *
 from market_stats.utils import setup_logger,exception_logger
 import time 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker  # Rename ticker to avoid conflicts
 
 
 stock_logger=setup_logger('stock',fp='./logs/',mode='w')
@@ -96,7 +97,7 @@ def make_plot(ticker,indicator,metric):
         }
 
 
-        fig,axes=make_my_plot(
+        fig,axes,df=make_my_plot(
         ticker = ticker
         ,plotname = None 
         ,datefrom = '2020-01-01' 
@@ -106,6 +107,7 @@ def make_plot(ticker,indicator,metric):
 
         # show fig 
         st.pyplot(fig)
+        return df 
 
 
 def make_histogram_plot(metric,ticker):
@@ -122,38 +124,93 @@ def make_histogram_plot(metric,ticker):
 
 
 
-def make_gains_plot(ticker,metric,cutoff):
+def compute_integrals(df):
+    # Compute the integral of the curve using actual x, y values
+    integrals = {}
+    for span in [5, 10, 20, 50, 100]:
+        # calculation of integral: 
+        #x_values = df['ID'][:span] 
+        #y_values = df['CLOSE_NORM'][:span] 
+        #integral = np.trapz(y_values, x=x_values)
+        #integral = integral - y_values.iloc[0]  # subtract the initial value
+        
+        # this shouldnt be an integral but last value minus first value 
+        x_values = df['ID'][:span].values 
+        y_values = df['CLOSE_NORM'][:span].values 
+        integral=y_values[-1]/y_values[0]
+
+        integrals[f'span_{span}'] = np.round(integral,2)
+
+    integrals['avg']=np.mean(list(integrals.values()))
+    integrals['min']=np.min(list(integrals.values()))
+    integrals['max']=np.max(list(integrals.values()))
+    return integrals
+
+
+def make_gains_plot(ticker,metric,cutoff,base_df):
     with st.spinner('Making gains plot...'):
         df=StatsView().gains_query(ticker,metric,cutoff)
         fig,ax=plt.subplots(1,1)
         # for each value of GID2 plot df with different color 
+        integrals_dic={}
         n=0
         for gid in df['GID2'].unique():
             df_=df[df['GID2']==gid]
             ax.plot(df_['GID'],df_['CLOSE_NORM'],'-')
+            integrals=compute_integrals(df_)
+            integrals_dic[f'curve_{gid}']=integrals
             n+=1
-        #ax.plot(df['GID'],df['CLOSE_NORM'],'-')
+                    # Place the label at the end of each curve
+            ax.text(df_['GID'].iloc[-1], df_['CLOSE_NORM'].iloc[-1], f"Curve {n}", 
+                verticalalignment='center', horizontalalignment='left')
+
+        #_=list(integrals_dic.keys()) [0]
+        #integrals_dic['agg']={k:0 for k in integrals_dic[_] .keys()}
+        integrals_df=pd.DataFrame(integrals_dic).T
+        integrals_df.loc['mean'] = integrals_df.iloc[:-1].mean()
+ 
+
+        
+
         
         st.write(f"for ticker {ticker} with cutoff value of {metric} = {cutoff} following {n} gain curves were observed")
         st.pyplot(fig)
         
-
         fig,ax=plt.subplots(1,1)
-        # for each value of GID2 plot df with different color 
         n=0
-        ax.plot(df['ID'],df['CLOSE'],'.k')
+        ax.plot(base_df['TS'],base_df['Close'],'.k')
+        ax2 = ax.twinx()
+
+        # Mask the data based on the cutoff
+        above_cutoff = base_df[metric].where(base_df[metric] > cutoff, np.nan)
+        below_cutoff = base_df[metric].where(base_df[metric] <= cutoff, np.nan)
+
+        # Plot the data with conditional coloring
+        ax2.plot(base_df['TS'], above_cutoff, '-g')  # Green for above cutoff
+        ax2.plot(base_df['TS'], below_cutoff, '-r')  # Red for below cutoff (optional, can be removed)
+        
+        # Set the secondary y-axis gridlines to show 10 equally spaced lines
+        y_min, y_max = ax2.get_ylim()  # Get the current y-axis limits
+        interval = (y_max - y_min) / 20  # Calculate the interval for 10 lines
+        ax2.yaxis.set_major_locator(mticker.MultipleLocator(interval))
+        ax2.grid(True, which='both')  # Ensure gridlines are shown for the secondary axis
+
+        n=0
+
         for gid in df['GID2'].unique():
+            logging.info(df_.columns)
+            print(df_.columns)
             df_=df[df['GID2']==gid]
-            ax.plot(df_['ID'],df_['CLOSE'],'-')
+
+            #ax.plot(df_['TS'],df_['CLOSE'],'-',label=f"Curve {n}")
             n+=1
-        # plot metric on secondary axis
-
-
+        #ax.legend()
         
-        st.write(df)
-        
-        st.write(f"for ticker {ticker} with cutoff value of {metric} = {cutoff} following {n} gain curves were observed")
+        st.write(f"Price action chart for {ticker} with cutoff value of {metric} = {cutoff} gain curves and underlying metric")
         st.pyplot(fig)
+        return integrals_df
+        
+        
         
 
 
@@ -186,7 +243,7 @@ if __name__=='__main__':
     plot_metrics=['EMA','EMA Distance','Cumulative EMA distance','Cumulative EMA Sign'] # would be nice to gather them from calcview 
     plot_metric=st.selectbox('select metric',plot_metrics,2)
     plot_indicator=st.selectbox('select indicator',indicator_columns,0)    
-    make_plot(ticker,plot_indicator,plot_metric)
+    df=make_plot(ticker,plot_indicator,plot_metric)
 
 # histogram plot 
 #    rank_perc_metrics=[i.replace('RANK_PERC_','') for i in metric_cols if 'RANK_PERC' in i]
@@ -196,5 +253,11 @@ if __name__=='__main__':
 # gains plot 
     gains_metric=st.selectbox('select gains metric',metric_cols,metric_cols.index('CUMDIST_EMA_100'))
     gains_cutoff=st.number_input('select gains cutoff',-9999.0,9999.0,-2.5,0.1)
-    make_gains_plot(ticker,gains_metric,gains_cutoff)
+    integrals_df=make_gains_plot(ticker,gains_metric,gains_cutoff,df)
+    # put agg rows as first 
+    integrals_df=integrals_df.reindex(['mean']+list(integrals_df.index[:-1]))
+
     
+ 
+    st.write(f"if you bought {ticker} at {gains_metric}={gains_cutoff} you would have make following gains")
+    st.write(integrals_df)

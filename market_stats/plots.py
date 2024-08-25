@@ -82,7 +82,7 @@ def make_my_plot(
     # Add legend to the main plot (axes[0])
     axes[0].legend(handles=ema_patches, loc='lower left')
     plt.savefig(f'./plots/{plotname}.png')
-    return fig,axes
+    return fig,axes,df
 
     # this plot plots a price action and colors when indicator is above / below a value 
 def make_my_plot_indicator( 
