@@ -119,9 +119,9 @@ class StatsView(Database):
         WITH GroupedData AS (
             SELECT 
                 *,
-                LAG("{metric}") OVER (ORDER BY "TS") AS PrevClose
+                LAG("{metric}") OVER (PARTITION BY "TICKER" ORDER BY "TS") AS PrevClose
             FROM 
-                "dev"."CALC_VIEW_{ticker}" cva 
+                "dev"."CV_ALL" cva 
         ),
         GroupIdentifiers AS (
             SELECT 
@@ -136,7 +136,7 @@ class StatsView(Database):
         GroupSum AS (
             SELECT 
                 *,
-                SUM(ChangeFlag) OVER (ORDER BY "TS") AS "GID2"
+                SUM(ChangeFlag) OVER (PARTITION BY "TICKER" ORDER BY "TS") AS "GID2"
             FROM 
                 GroupIdentifiers
         ),
@@ -151,13 +151,13 @@ class StatsView(Database):
         IndexedData AS (
             SELECT 
                 *,
-                ROW_NUMBER() OVER (PARTITION BY "GID2" ORDER BY "TS") AS RowIndex
+                ROW_NUMBER() OVER (PARTITION BY "TICKER", "GID2" ORDER BY "TS") AS RowIndex
             FROM 
                 FilteredData
         )
         SELECT 
             RowIndex AS "GID",  "GID2",
-           "{metric}","OPEN", "CLOSE", "LOW","HIGH","TS","ID"
+           "{metric}","OPEN", "CLOSE", "LOW","HIGH","TS","ID","TICKER"
         FROM 
             IndexedData
         ORDER BY 
@@ -169,7 +169,7 @@ class StatsView(Database):
         
         query=f"""
             WITH CTE AS (
-           SELECT "{metric}","TS", "CLOSE","GID","ID","GID2", FIRST_VALUE("CLOSE") OVER ( PARTITION BY  "GID2" ORDER BY "GID") AS "FV" 
+           SELECT "{metric}","TS", "CLOSE","GID","ID","GID2","TICKER", FIRST_VALUE("CLOSE") OVER ( PARTITION BY "TICKER", "GID2" ORDER BY "GID") AS "FV" 
            FROM "dev"."GAINS_VIEW"
            --where "GID"<100
         ) ,q AS (
@@ -179,9 +179,10 @@ class StatsView(Database):
         , CASE WHEN "CLOSE_NORM">=1 THEN 2 ELSE 0 END AS "CNN"
         FROM Q 
         )
-        SELECT *, avg("CNN") OVER ( ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
-                ,AVG("CLOSE_NORM") OVER ( ORDER BY "GID") AS "CLOSE_NORM_AVE"
+        SELECT *, avg("CNN") OVER (PARTITION BY "TICKER" ORDER BY "GID" ) AS "CLOSE_NORM_AVE_SIGN" 
+                ,AVG("CLOSE_NORM") OVER (PARTITION BY "TICKER" ORDER BY "GID") AS "CLOSE_NORM_AVE"
 	FROM Q2         
+    WHERE "TICKER"='{ticker}'
        ORDER BY "GID2","GID"  
         """
         df=self.execute_select(query)
