@@ -1,1 +1,3 @@
 ms_venv*
+.env
+data/
