@@ -1,5 +1,0 @@
-2024-08-25 11:13:50,602 - streamlit - INFO - initializing db
-2024-08-25 11:13:50,602 - streamlit - INFO - initializing db_con_time
-2024-08-25 11:13:50,602 - streamlit - INFO - initializing nasdaq_symbols
-2024-08-25 11:13:50,603 - streamlit - INFO - initializing first_run
-2024-08-25 11:13:50,646 - streamlit - INFO - connecting to db
