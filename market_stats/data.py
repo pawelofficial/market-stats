@@ -3,7 +3,13 @@ import pandas as pd
 import os 
 import requests
 
-from utils import * 
+# switch to from app.back.utils import * if you are running this script from main.py
+from market_stats.utils import * 
+#if __name__=='__main__':
+#    from utils import * 
+#else:
+#    from app.back.utils import * 
+
 class Data(ABC):
     def __init__(self):
         self.this_path = os.path.dirname(os.path.abspath(__file__))
@@ -11,7 +17,13 @@ class Data(ABC):
         self.logger = setup_logger('data',fp=os.path.join(self.this_path,'logs') )
         self.base_columns = ['open', 'close', 'low', 'high','volume']
         self.tickers_map = {'SPX': '^GSPC', 'BTC': 'BTC-USD','BTCUSDT':'BTC'}
- 
+        self.logger.info('Data class initialized')
+        self.df=None
+        self.metadata={}
+        
+    def save_metadata(self,**kwargs):
+        for k,v in kwargs.items():
+            self.metadata[k]=v
     
     @abstractmethod
     def download_data(self):
@@ -21,44 +33,49 @@ class BinanceData(Data):
     def __init__(self):
         super().__init__()  # <-- This calls Data's __init__, setting self.data_path
         self.base_columns = ['open', 'close', 'low', 'high','volume']
+        self.logger.info('BinanceData class initialized')
     
     def download_data(self
                       ,symbol
                       ,interval='1d'
-                      ,startTime = '2020-01-01'
-                      ,endTime = '2025-01-01'
+                      ,startTime = '2020-01-01' # yyyy-mm-dd
+                      ,endTime = '2025-01-01'   # yyyy-mm-dd
                       ,save=True
+                      ,cleanup=True
                       ):
-        startime=to_milliseconds(startTime)
+        self.logger.info(f'downloading data for {symbol} from {startTime} to {endTime}')
+        starttime=to_milliseconds(startTime)
         endtime=to_milliseconds(endTime)
         filenames=[]
         while True:
-            df=self._get_binance_candles(symbol, interval=interval, limit=500,startTime=startime,endTime=None,save=save)
+            df=self._get_binance_candles(symbol, interval=interval, limit=500,startTime=starttime,endTime=None)
             start=str(to_datetime(df['unixtimestamp'].iloc[0])).replace(':','_').replace(' ','_')
             end=str(to_datetime(df['unixtimestamp'].iloc[-1])).replace(':','_').replace(' ','_')
             filename = os.path.join(os.path.join(self.data_path,'tmp') , f'{self.tickers_map[symbol]}_{start}_{end}.csv')
             df.to_csv(filename)
-            startime=df['unixtimestamp'].iloc[-1]+1
+            
+            starttime=df['unixtimestamp'].iloc[-1]+1
             filenames.append(filename)
-            if startime > endtime:
+            assert starttime > endtime or len(df) == 500, 'missing candles'
+            if starttime > endtime:
                 break
             
         master_df=pd.concat([pd.read_csv(filename) for filename in filenames])
         master_df.to_csv(os.path.join(self.data_path, f'{self.tickers_map[symbol]}_{startTime}_{endTime}.csv'))
         
-        # go through files to check if there are any missing candles
-        for filename in filenames:
-            df=pd.read_csv(filename)
-            if len(df) != 500 and filename !=filenames[-1]: # last filename wont have 500 candles
-                print(f'file {filename} has {len(df)} candles')
-                print(df)
-                raise ValueError('missing candles')
-
+        if save:
+            self.df=master_df
+        
+        if cleanup:
+            for filename in filenames:
+                os.remove(filename)
+        
+        self.save_metadata(symbol=symbol,interval=interval,startTime=startTime,endTime=endTime,size=len(master_df))
+                
     def _get_binance_candles(self,symbol, interval="1m"
                                 , limit=1000     # fetches this number of candles
                                 , startTime=None # unixtimestamp 
                                 , endTime=None  # unixtimestamp 
-                                ,save=True
                                 ):
             print('downloading the data ! ')
             url = "https://api.binance.com/api/v3/klines"
@@ -120,9 +137,6 @@ class BinanceData(Data):
             for col in self.base_columns:
                 df[col]=df[col].astype(float)
 
-
-
-
             return df
 
 
@@ -132,3 +146,4 @@ if __name__=='__main__':
     
     obj=BinanceData()
     obj.download_data('BTCUSDT',interval='1d',startTime='2020-01-01',endTime='2025-01-01',save=True)
+    print(obj.metadata)

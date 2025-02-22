@@ -1,3 +1,6 @@
 ms_venv*
 .env
 data/
+app/
+old/
+pkg/

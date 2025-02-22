@@ -14,7 +14,8 @@ def to_datetime(unixtimestamp):
 def setup_logger(name,mode='w',fp=None):
     # Create a custom logger
     if fp is None:
-        fp=os.path.join(this_path,'logs')
+        this_path=os.path.dirname(os.path.abspath(__file__))
+        fp=os.path.join(fp)
     logger = logging.getLogger(name)
 
     # Set the level of logger to INFO
