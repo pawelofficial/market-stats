@@ -2,8 +2,19 @@ import datetime
 import logging 
 import os 
 import pandas as pd 
-def to_milliseconds(date_str):
+
+def to_milliseconds(date_str,inclusive=False):
     """Convert a date string (YYYY-MM-DD) to Binance timestamp (milliseconds)."""
+    if inclusive:
+        # Add 1 day to the end date
+        date_str = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        date_str = date_str + datetime.timedelta(days=1)
+        date_str=date_str.strftime('%Y-%m-%d')
+    else:
+        date_str = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        date_str = date_str + datetime.timedelta(days=-1)
+        date_str=date_str.strftime('%Y-%m-%d')
+        
     dt = datetime.datetime.strptime(date_str, "%Y-%m-%d")  # Use datetime.datetime
     return int(dt.timestamp() * 1000)
 

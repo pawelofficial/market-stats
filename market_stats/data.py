@@ -28,24 +28,69 @@ class Data(ABC):
     @abstractmethod
     def download_data(self):
         pass  # Must be implemented by subclasses
+    
+    
+    def save_cache(self,df):
+        fp=os.path.join(self.data_path,'cache.csv')
+        symbol=self.metadata['symbol']
+        interval=self.metadata['interval']
+        start_ts=df.iloc[0]['unixtimestamp']
+        end_ts=df.iloc[-1]['unixtimestamp']
+        filename=self.metadata['filename']
+        tmp_df=pd.DataFrame({'symbol':[symbol],'interval':[interval],'start_unixtimestamp':[start_ts],'end_unixtimestamp':[end_ts],'filename':[filename] }  )
+        tmp_df.to_csv(fp,index=False,mode='a',header=False)
+
+    def check_cache(self
+                    ,symbol
+                    ,interval
+                    ,start_unixtimestamp
+                    ,end_unixtimestamp   # yyyy-mm-dd)
+                      ):
+        cache_df=pd.read_csv(os.path.join(self.data_path,'cache.csv')).drop_duplicates()
+        msk=(cache_df['symbol']==symbol) & (cache_df['interval']==interval) & (cache_df['start_unixtimestamp']<=start_unixtimestamp) & (cache_df['end_unixtimestamp']>=end_unixtimestamp)
+
+        filename=cache_df[msk].iloc[0]['filename']
+        df=pd.read_csv(os.path.join(self.data_path,filename))
+        # filter out df based on timestamps 
+        msk=(df['unixtimestamp']>=start_unixtimestamp) & (df['unixtimestamp']<=end_unixtimestamp)
+        df=df[msk]
+        if not df.empty:
+            return df
+        
+
 
 class BinanceData(Data):
     def __init__(self):
         super().__init__()  # <-- This calls Data's __init__, setting self.data_path
         self.base_columns = ['open', 'close', 'low', 'high','volume']
         self.logger.info('BinanceData class initialized')
+
     
     def download_data(self
                       ,symbol
                       ,interval='1d'
-                      ,startTime = '2020-01-01' # yyyy-mm-dd
+                      ,startTime = '2021-01-01' # yyyy-mm-dd
                       ,endTime = '2025-01-01'   # yyyy-mm-dd
                       ,save=True
                       ,cleanup=True
                       ):
+
+        self.metadata['symbol']=symbol
+        self.metadata['interval']=interval
         self.logger.info(f'downloading data for {symbol} from {startTime} to {endTime}')
         starttime=to_milliseconds(startTime)
-        endtime=to_milliseconds(endTime)
+        endtime=to_milliseconds(endTime,inclusive=True)
+
+        
+        df=self.check_cache(symbol=symbol,interval=interval,start_unixtimestamp=starttime,end_unixtimestamp=endtime)
+        if df is not None:
+            self.df=df
+            print('from cache')
+            #print(df.iloc[0]['close_datetime'] )
+            #print(df.iloc[-1]['close_datetime'] )
+            #print(df)
+            return df
+
         filenames=[]
         while True:
             df=self._get_binance_candles(symbol, interval=interval, limit=500,startTime=starttime,endTime=None)
@@ -61,7 +106,9 @@ class BinanceData(Data):
                 break
             
         master_df=pd.concat([pd.read_csv(filename) for filename in filenames])
-        master_df.to_csv(os.path.join(self.data_path, f'{self.tickers_map[symbol]}_{startTime}_{endTime}.csv'))
+        master_df_filename= f'{self.tickers_map[symbol]}_{startTime}_{endTime}.csv'
+        self.metadata['filename']=master_df_filename
+        master_df.to_csv(os.path.join(self.data_path,master_df_filename))
         
         if save:
             self.df=master_df
@@ -71,6 +118,8 @@ class BinanceData(Data):
                 os.remove(filename)
         
         self.save_metadata(symbol=symbol,interval=interval,startTime=startTime,endTime=endTime,size=len(master_df))
+        self.save_cache(master_df)
+        print(len(master_df))
                 
     def _get_binance_candles(self,symbol, interval="1m"
                                 , limit=1000     # fetches this number of candles
@@ -136,6 +185,7 @@ class BinanceData(Data):
             # cast base columns to float
             for col in self.base_columns:
                 df[col]=df[col].astype(float)
+
 
             return df
 
