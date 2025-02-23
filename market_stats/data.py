@@ -47,15 +47,16 @@ class Data(ABC):
                     ,end_unixtimestamp   # yyyy-mm-dd)
                       ):
         cache_df=pd.read_csv(os.path.join(self.data_path,'cache.csv')).drop_duplicates()
-        msk=(cache_df['symbol']==symbol) & (cache_df['interval']==interval) & (cache_df['start_unixtimestamp']<=start_unixtimestamp) & (cache_df['end_unixtimestamp']>=end_unixtimestamp)
 
-        filename=cache_df[msk].iloc[0]['filename']
-        df=pd.read_csv(os.path.join(self.data_path,filename))
-        # filter out df based on timestamps 
-        msk=(df['unixtimestamp']>=start_unixtimestamp) & (df['unixtimestamp']<=end_unixtimestamp)
-        df=df[msk]
-        if not df.empty:
-            return df
+        msk=(cache_df['symbol']==symbol) & (cache_df['interval']==interval) & (cache_df['start_unixtimestamp']<=start_unixtimestamp) & (cache_df['end_unixtimestamp']>=end_unixtimestamp)
+        if not cache_df[msk].empty:
+            filename=cache_df[msk].iloc[0]['filename']
+            df=pd.read_csv(os.path.join(self.data_path,filename))
+            # filter out df based on timestamps 
+            msk=(df['unixtimestamp']>=start_unixtimestamp) & (df['unixtimestamp']<=end_unixtimestamp)
+            df=df[msk]
+            if not df.empty:
+                return df
         
 
 
@@ -86,9 +87,9 @@ class BinanceData(Data):
         if df is not None:
             self.df=df
             print('from cache')
-            #print(df.iloc[0]['close_datetime'] )
-            #print(df.iloc[-1]['close_datetime'] )
-            #print(df)
+            print(df.iloc[0]['close_datetime'] )
+            print(df.iloc[-1]['close_datetime'] )
+            print(df)
             return df
 
         filenames=[]
@@ -96,7 +97,7 @@ class BinanceData(Data):
             df=self._get_binance_candles(symbol, interval=interval, limit=500,startTime=starttime,endTime=None)
             start=str(to_datetime(df['unixtimestamp'].iloc[0])).replace(':','_').replace(' ','_')
             end=str(to_datetime(df['unixtimestamp'].iloc[-1])).replace(':','_').replace(' ','_')
-            filename = os.path.join(os.path.join(self.data_path,'tmp') , f'{self.tickers_map[symbol]}_{start}_{end}.csv')
+            filename = os.path.join(os.path.join(self.data_path,'tmp') , f'{self.tickers_map[symbol]}_{start}_{end}_{interval}.csv')
             df.to_csv(filename)
             
             starttime=df['unixtimestamp'].iloc[-1]+1
@@ -106,7 +107,7 @@ class BinanceData(Data):
                 break
             
         master_df=pd.concat([pd.read_csv(filename) for filename in filenames])
-        master_df_filename= f'{self.tickers_map[symbol]}_{startTime}_{endTime}.csv'
+        master_df_filename= f'{self.tickers_map[symbol]}_{startTime}_{endTime}_{interval}.csv'
         self.metadata['filename']=master_df_filename
         master_df.to_csv(os.path.join(self.data_path,master_df_filename))
         

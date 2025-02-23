@@ -10,9 +10,12 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 # Now you can import from "back"
 from market_stats.data import *
-
+from market_stats.plotter import * 
 
 bd=BinanceData()
-#bd.download_data('BTCUSDT',interval='1d',startTime='2020-01-01',endTime='2025-01-01',save=True)
-
+bd.download_data('BTCUSDT',interval='1d',startTime='2024-01-01',endTime='2025-01-01',save=True)
+p=Plotter(bd.df)
+plot_fp=p.candleplot2(interval='1d',asset='BTC',df=bd.df,ser=None,date_column='datetime',save=True,show=False)
+# show plot 
+st.image(plot_fp)
 st.write(bd.metadata)
