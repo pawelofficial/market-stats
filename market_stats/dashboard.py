@@ -13,7 +13,15 @@ from market_stats.data import *
 from market_stats.plotter import * 
 
 bd=BinanceData()
-bd.download_data('BTCUSDT',interval='1d',startTime='2024-01-01',endTime='2025-01-01',save=True)
+
+# startTime, endTime selector
+st.write('Select the start and end time for the data')
+start_time=st.date_input('Start Time',value=pd.to_datetime('2024-01-01'))
+end_time=st.date_input('End Time',value=pd.to_datetime('2025-01-01'))
+# cast to string 
+
+
+bd.download_data('BTCUSDT',interval='1d',startTime=start_time.strftime('%Y-%m-%d'),endTime=end_time.strftime('%Y-%m-%d'),save=True)
 p=Plotter(bd.df)
 plot_fp=p.candleplot2(interval='1d',asset='BTC',df=bd.df,ser=None,date_column='datetime',save=True,show=False)
 # show plot 
